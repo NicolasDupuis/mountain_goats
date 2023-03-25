@@ -274,7 +274,7 @@ def save_new_place(
     ]).reset_index()[['waypoint', 'latitude','longitude', 'altitude', 'category']]
 
     # Save to local file
-    places.to_json('data/places.json', orient='table', index=False)
+    places.to_json('places.json', orient='table', index=False)
 
     # for dropdown
     places_data = places['waypoint'].unique()
@@ -427,7 +427,7 @@ def save_new_place(
     activities = activities.reset_index()[['label', 'category', 'grade', 'date', 'days', 'context', 'role', 'waypoints', 'participants', 'topo', 'comments']]
 
     # Save to local file
-    activities.to_json('data/activities.json', orient='table', index=False)
+    activities.to_json('activities.json', orient='table', index=False)
 
     return (
         hide_alert,

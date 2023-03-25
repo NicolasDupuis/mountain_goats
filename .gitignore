@@ -6,5 +6,5 @@ _local
 data/places.xlsx
 data/.mapbox_token
 data/backup
-data/places.json
-data/activities.json
+places.json
+activities.json

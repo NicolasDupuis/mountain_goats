@@ -19,14 +19,14 @@ def load_data():
     '''
 
     try: 
-        places = pd.read_json('data/places.json',orient='table')
+        places = pd.read_json('places.json',orient='table')
     except:
         places = pd.DataFrame(
             columns=['waypoint', 'latitude', 'longitude', 'altitude', 'category']
         )
 
     try:
-        activities = pd.read_json('data/activities.json', orient='table').sort_values(by=['date'], ascending=[False])
+        activities = pd.read_json('activities.json', orient='table').sort_values(by=['date'], ascending=[False])
     except:
         activities = pd.DataFrame(
             columns=['label', 'category', 'grade', 'date', 'days', 'context', 'role', 'waypoints', 'participants', 'topo', 'comments']
