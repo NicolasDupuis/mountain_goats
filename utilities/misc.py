@@ -36,7 +36,7 @@ def load_data():
 
 
 #------------------------------------------------------------------------------------------------------------
-def massage_actitivy_data(activities, grades):
+def massage_activity_data(activities, grades):
 
     activities['grade_num'] = activities.apply(apply_numeric_grading, grades=grades, axis=1)
     activities['date'] = activities['date'].astype('str')

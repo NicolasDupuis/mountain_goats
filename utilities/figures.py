@@ -2,21 +2,28 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import yaml
+import utilities
 
 
 #------------------------------------------------------------------------------------------------
-def import_colors():
+def import_colors(
+    scope   : str,
+    language: str,
+) -> dict:
 
     with open('data/color_settings.yaml') as file:
-        colors = yaml.load(file, Loader=yaml.FullLoader)
-    
-    return colors
+        colors_settings = yaml.load(file, Loader=yaml.FullLoader)
+
+    translation = utilities.translation[scope]
+
+    return {translation[key][language]: colors_settings[scope][key] for key in colors_settings[scope]}
 
 
 #------------------------------------------------------------------------------------------------------------
 def get_waypoints_overtime(
     places    : pd.DataFrame,
-    activities: pd.DataFrame
+    activities: pd.DataFrame,
+    language  :str
 ) -> pd.DataFrame:
     '''
     Merge Places and Activities to get waypoints per time period
@@ -29,7 +36,7 @@ def get_waypoints_overtime(
     df1['year'] = df1['date'].str.split('-').str[0].astype(int)
 
     activity_year = df1.merge(
-        places[['waypoint', 'category', 'altitude', 'latitude', 'longitude']],
+        places[['waypoint', 'category', 'category_translated', 'altitude', 'latitude', 'longitude']],
         how = 'left',
         on  = 'waypoint'
     ).dropna()
@@ -39,7 +46,8 @@ def get_waypoints_overtime(
 
 #------------------------------------------------------------------------------------------------
 def figure_activities_overtime(
-    activities: pd.DataFrame
+    activities: pd.DataFrame,
+    language  : str
 ) -> go.Figure:
     '''
     Days in the mountain, over time and by activity category
@@ -48,27 +56,38 @@ def figure_activities_overtime(
     if len(activities) == 0:
         return go.Figure()
 
-    colors = import_colors()
+    colors = import_colors('activities', language)
+    df = pd.DataFrame(activities.groupby(['year', 'category_translated'])['days'].sum()).reset_index()
 
-    df = pd.DataFrame(activities.groupby(['year', 'category'])['days'].sum()).reset_index()
+    df['year'] = df['year'].astype(int)
 
     activities_overtime = go.Figure(
         data = [go.Bar(
             name         = activity,
-            x            = list(df[df['category'] == activity]['year']),
-            y            = list(df[df['category'] == activity]['days']),
-            marker_color = colors['activity_category_color'][activity])
+            x            = list(df[df['category_translated'] == activity]['year']),
+            y            = list(df[df['category_translated'] == activity]['days']),
+            marker_color = colors[activity])
     
-            for activity in df['category'].unique()
+            for activity in df['category_translated'].unique()
         ]
     )
 
-    activities_overtime.update_layout(barmode='stack')
-    activities_overtime.update_layout(yaxis=dict(title='days'))
+    activities_overtime.update_layout(
+        barmode = 'stack',
+        height  = 600,
+        yaxis   = dict(title='days')
+    )
 
     df = activities.groupby(['year'])['days'].sum()
+
     for year, days in df.items():
-        activities_overtime.add_annotation(x=year, y=days+3, text=f"{days}", showarrow=False)
+
+        activities_overtime.add_annotation(
+            x         = year,
+            y         = days+3,
+            text      = days,
+            showarrow = False
+        )
 
     return activities_overtime
 
@@ -76,26 +95,25 @@ def figure_activities_overtime(
 #------------------------------------------------------------------------------------------------
 def figure_waypoints_overtime(
     places    : pd.DataFrame,
-    activities: pd.DataFrame
-):
+    activities: pd.DataFrame,
+    language  : str
+) -> go.Figure:
     '''
     Waypoints in the mountain, over time and by category
     '''
      
-    colors = import_colors()
-
-    waypoints_overtime = get_waypoints_overtime(places, activities)
-
-    waypoints_overtime = pd.DataFrame(waypoints_overtime.groupby(['year', 'category'])['waypoint'].count()).reset_index()
+    colors = import_colors('places', language)
+    waypoints_overtime = get_waypoints_overtime(places, activities, language)
+    waypoints_overtime = pd.DataFrame(waypoints_overtime.groupby(['year', 'category_translated'])['waypoint'].count()).reset_index()
 
     waypoints_overtime_fig = go.Figure(
         data = [go.Bar
             (name        = category,
-             x           = list(waypoints_overtime[waypoints_overtime['category'] == category]['year']),
-             y           = list(waypoints_overtime[waypoints_overtime['category'] == category]['waypoint']),
-             marker_color = colors['waypoint_category_color'][category])
+             x           = list(waypoints_overtime[waypoints_overtime['category_translated'] == category]['year']),
+             y           = list(waypoints_overtime[waypoints_overtime['category_translated'] == category]['waypoint']),
+             marker_color = colors[category])
                 
-            for category in waypoints_overtime['category'].unique()
+            for category in waypoints_overtime['category_translated'].unique()
         ]
     )                  
         
@@ -107,7 +125,8 @@ def figure_waypoints_overtime(
 
 #------------------------------------------------------------------------------------------------
 def figure_context_evolution(
-    activities: pd.DataFrame
+    activities: pd.DataFrame,
+    language : str
 ) -> go.Figure:
     '''
     Create context evolution plot
@@ -157,35 +176,32 @@ def figure_context_evolution(
 
 
 #------------------------------------------------------------------------------------------------
-def figure_climb_by_grades(activities):
+def grades_overtime(
+    activities : pd.DataFrame, 
+    language   : str
+) -> go.Figure:
     '''
-    Activities by grades
+    Activities by grades, overtime
     '''
 
     climb_by_grades = {}
-    colors = import_colors()
+    colors = import_colors('activities', language)
 
-    for activity in ['mountaineering', 'hike', 'climbing', 'ski']:
+    activities = activities[activities['grade'] !='Piste']
 
-        if activity == 'ski': 
-            df = activities[
-                (activities['category'] == activity) & 
-                (activities['grade']    != 'Piste' )
-            ]
+    for activity in colors.keys():
 
-        else: 
-            df = activities[activities['category']==activity]
+        df = activities[activities['category_translated']==activity].sort_values(by='grade_num')
         
-        df = df.sort_values(by='grade')
         fig = go.Figure(
             data = go.Scatter(
-                        x            = df['date'],
-                        y            = df['grade'],
-                        mode         = 'markers',
-                        marker_color = colors['activity_category_color'][activity],
-                        text         = df['label']
-                    )
+                x            = df['date'],
+                y            = df['grade'],
+                mode         = 'markers',
+                marker_color = colors[activity],
+                text         = df['label']
             )
+        )
 
         total = df.groupby('grade').count()
         for idx, row in total.iterrows():
@@ -198,13 +214,14 @@ def figure_climb_by_grades(activities):
         
 
 #------------------------------------------------------------------------------------------------
-def update_waypoints_figure(
+def waypoints_by_altitude(
     places: pd.DataFrame,
     altitude_range,
-    categories
+    categories, 
+    language
 ):
 
-    colors = import_colors()
+    colors = import_colors('places', language)
 
     # Apply user's filter on places 
     df = places[
@@ -220,13 +237,13 @@ def update_waypoints_figure(
     fig = go.Figure(
         data = [go.Scatter(
             name         = category,
-            x            = df[df['category']==category]['index'],
-            y            = df[df['category']==category]['altitude'],
+            x            = df[df['category_translated']==category]['index'],
+            y            = df[df['category_translated']==category]['altitude'],
             mode         = 'markers',
-            text         = df[df['category']==category]['waypoint'],
-            marker_color = colors['waypoint_category_color'][category])
+            text         = df[df['category_translated']==category]['waypoint'],
+            marker_color = colors[category])
 
-            for category in df['category'].unique()
+            for category in df['category_translated'].unique()
         ]
     )                            
 
@@ -237,15 +254,16 @@ def update_waypoints_figure(
 
 
 #------------------------------------------------------------------------------------------------
-def update_waypoints_year_figure(
-    places,
-    activities,
-    altitude_range,
-    categories
-):
+def waypoints_by_year(
+    places         : pd.DataFrame,
+    activities     : pd.DataFrame,
+    altitude_range : list,
+    categories     : list,
+    language       : str
+) -> go.Figure:
 
-    waypoints_overtime = get_waypoints_overtime(places, activities)
-    colors = import_colors()    
+    waypoints_overtime = get_waypoints_overtime(places, activities, language)
+    colors = import_colors('places', language)
 
     filtered_places = waypoints_overtime[
         (waypoints_overtime['altitude'] >= altitude_range[0]) &
@@ -256,21 +274,20 @@ def update_waypoints_year_figure(
     figure = go.Figure(
         data = [ go.Scatter(
             name         = category,
-            x            = filtered_places[filtered_places['category']==category]['date'],
-            y            = filtered_places[filtered_places['category']==category]['altitude'],
+            x            = filtered_places[filtered_places['category_translated']==category]['date'],
+            y            = filtered_places[filtered_places['category_translated']==category]['altitude'],
             mode         = 'markers',
-            text         = filtered_places[filtered_places['category']==category]['waypoint'],
-            marker_color = colors['waypoint_category_color'][category])
+            text         = filtered_places[filtered_places['category_translated']==category]['waypoint'],
+            marker_color = colors[category])
 
-            for category in filtered_places['category'].unique()
+            for category in filtered_places['category_translated'].unique()
         ]
     )
 
-    figure.update_layout(yaxis=dict(title='Altitude'))
-
     figure.update_layout(
-        autosize=False,
-        height=800)
+        yaxis    = dict(title='Altitude'),
+        autosize = False,
+        height   = 800)
 
     return figure
 
@@ -278,6 +295,7 @@ def update_waypoints_year_figure(
 #------------------------------------------------------------------------------------------------------------
 def create_map(
     all_places      : pd.DataFrame,
+    language        : str,
     search_place    = None,
     height          = 800,
     altitude_values = None,
@@ -285,7 +303,7 @@ def create_map(
     year_values     = None,
     year_range      = None,
     categories      = None,
-    zoom            = 8
+    zoom            = 8,    
 ) -> px.scatter_mapbox:
 
     # User searched for that place, let's focus on it
@@ -313,13 +331,13 @@ def create_map(
     #                                                 datetime(year_values[1] - 1, 12, 31),
     #                                                 inclusive='both')]
 
-    waypoint_category_colors = import_colors()['waypoint_category_color']
+    waypoint_category_colors = import_colors('places', language)
     
     map_figure = px.scatter_mapbox(
         all_places,
         lat                     = "latitude", 
         lon                     = "longitude",
-        color                   = 'category',
+        color                   = 'category_translated',
         color_discrete_map      = {category: waypoint_category_colors[category] for category in waypoint_category_colors},
         hover_name              = "waypoint",
         hover_data              = ['altitude'],
@@ -333,6 +351,10 @@ def create_map(
     except:
         pass
 
-    map_figure.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+
+    map_figure.update_layout(
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        legend_title = "",
+    )
 
     return map_figure

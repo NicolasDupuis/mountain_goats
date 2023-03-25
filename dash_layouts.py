@@ -469,8 +469,6 @@ def stats_segment(
     language
 ) -> html:
     
-    figure_climb_by_grades = utilities.figure_climb_by_grades(activities)
-
     layout = html.Div([
                 
         dmc.SegmentedControl(
@@ -514,25 +512,10 @@ def stats_segment(
 
         ], id='stats_year', style={'display': 'none'}),
 
-        html.Div([
-            dbc.Row([
-                dbc.Col([
-                    dcc.Graph(figure=figure_climb_by_grades['mountaineering']),
-                ], width=6),
-                dbc.Col([
-                    dcc.Graph(figure=figure_climb_by_grades['hike']),
-                ], width=6),         
-                dbc.Col([
-                    dcc.Graph(figure=figure_climb_by_grades['ski']),
-                ], width=6),  
-                dbc.Col([
-                    dcc.Graph(figure=figure_climb_by_grades['climbing']),
-                ], width=6),                                              
-            ]),
-        ], id='stats_grade', style={'display': 'none'}),
+        html.Div(id='grades_overtime', style={'display': 'none'}),
         
         html.Div([
-            dcc.Graph(figure=utilities.figure_context_evolution(activities)),
+            dcc.Graph(figure=utilities.figure_context_evolution(activities, language)),
         ], id='stats_context', style={'display': 'none'})
     ])
     
@@ -553,7 +536,7 @@ def main_layout(
     places, activities = utilities.load_data()
     
     # Massage data
-    activities = utilities.massage_actitivy_data(activities, metadata['activity'])
+    activities = utilities.massage_activity_data(activities, metadata['activity'])
 
     layout = html.Div([
         

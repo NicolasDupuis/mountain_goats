@@ -1,11 +1,11 @@
-from dash import Input, Output, State, ctx
+from dash import Input, Output, State, ctx, dcc
 from dash import html
 from app_init import app
 import utilities
 import pandas as pd
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
-import plotly.express as px
+import dash_bootstrap_components as dbc
 
 
 # Switch tab
@@ -38,11 +38,11 @@ def switch_layout(layout):
 # Switch stats
 #----------------------------------------------------------------------------
 @app.callback(
-    [Output('stats_places',  'style'),
-     Output('stats_year',    'style'),
-     Output('stats_grade',   'style'),
-     Output('stats_context', 'style')],
-     Input('stats_segments', 'value')
+    [Output('stats_places',   'style'),
+     Output('stats_year',     'style'),
+     Output('grades_overtime','style'),
+     Output('stats_context',  'style')],
+     Input ('stats_segments', 'value')
 )
 def switch_stats(stat):
 
@@ -444,7 +444,8 @@ def save_new_place(
      Output('summits_total',             'children'),
      Output('passes_total',              'children'),
      Output('huts_total',                'children'),
-     Output('activities_tabulator',      'data'    )],
+     Output('activities_tabulator',      'data'    ),
+     Output('grades_overtime',           'children')],
     [Input ('altitude_slider',           'value'   ),
      Input ('year_slider',               'value'   ),                
      Input ('category_selection',        'value'   ),
@@ -457,11 +458,12 @@ def save_new_place(
     [State ('altitude_slider',           'min'     ),
      State ('altitude_slider',           'max'     ), 
      State ('year_slider',               'min'     ),
-     State ('year_slider',               'max'     )]
+     State ('year_slider',               'max'     ),
+     State ('metadata_store',            'data'    )]
 )
 def update_all(
-    altitude_values, year_values, categories, search_place, switch, places_store, activity_store, filter_waypoint,language,
-    min_alt, max_alt, min_year, max_year, 
+    altitude_values, year_values, categories, search_place, switch, places_store, activity_store, filter_waypoint, language,
+    min_alt, max_alt, min_year, max_year, metadata_store
 ):
 
     if len(places_store)==0 or len(activity_store)==0:
@@ -477,6 +479,7 @@ def update_all(
     stats_places = places.groupby('category')['category'].count()
 
     activities = pd.DataFrame(activity_store).sort_values(by='date', ascending=False)
+    activities = utilities.massage_activity_data(activities, metadata_store['activity'])
     
     # Translate categorical variables
     categories_map = utilities.translation['activities']
@@ -489,22 +492,39 @@ def update_all(
     role_map = {key: role_map[key][language] for key in role_map }
     activities['role_translated'] = activities['role'].map(role_map)
 
+    category_map = utilities.translation['places']
+    category_map = {key: category_map[key][language] for key in category_map }
+    places['category_translated'] = places['category'].map(category_map)
+
     if filter_waypoint:
         activities = activities[activities['waypoints'].str.contains(filter_waypoint, regex=False, na=False)]
 
     if switch == 'altitude':
-        all_waypoints_figure = utilities.update_waypoints_figure(places, (min_alt, max_alt), categories)
+        all_waypoints_figure = utilities.waypoints_by_altitude(places, (min_alt, max_alt), categories, language)
 
     elif switch == 'year':
-        all_waypoints_figure = utilities.update_waypoints_year_figure(places, activities, (min_alt, max_alt), categories)
+        all_waypoints_figure = utilities.waypoints_by_year(places, activities, (min_alt, max_alt), categories, language)
 
     if search_place:
         search_place = [search_place]
 
+    grades_overtime = utilities.grades_overtime(activities, language)
+    grades_overtime_layout = html.Div(
+        dbc.Row(
+            [
+                dbc.Col([
+                    dcc.Graph(figure=grades_overtime[key])
+                ], width=6)
+            for key in grades_overtime]
+        )
+    )
+
+
     map_figure = utilities.create_map(
         places,
+        language,
         search_place, 
-        700,
+        800,
         altitude_values,
         (min_alt, max_alt), 
         year_values,
@@ -518,31 +538,41 @@ def update_all(
         stats_places['summit'],
         stats_places['pass'],
         stats_places['hut'],
-        activities.to_dict('records')
+        activities.to_dict('records'),
+        grades_overtime_layout
     )
 
 
 # Update Year stats figures on switch
 #----------------------------------------------------------------------------
 @app.callback(
-     Output('year_stats_figure', 'figure'),
-     Input ('switch_year_stats', 'value' ),
-    [State ('activities_store',  'data'  ),
-     State ('places_store',      'data'  )]
+     Output('year_stats_figure', 'figure'  ),
+     Input ('switch_year_stats', 'value'   ),
+    [State ('activities_store',  'data'    ),
+     State ('places_store',      'data'    ),
+     State ('language',          'children')],
 )
 def update_year_figure(
     switch,
-    activity_store, places_store
+    activity_store, places_store, language
 ):
     
     activities = pd.DataFrame(activity_store)
     places = pd.DataFrame(places_store)
 
+    categories_map = utilities.translation['activities']
+    categories_map = {key: categories_map[key][language] for key in categories_map }
+    activities['category_translated'] = activities['category'].map(categories_map)
+
+    category_map = utilities.translation['places']
+    category_map = {key: category_map[key][language] for key in category_map }
+    places['category_translated'] = places['category'].map(category_map)
+
     if switch == 'year':
-        figure = utilities.figure_activities_overtime(activities)
+        figure = utilities.figure_activities_overtime(activities, language)
 
     elif switch=='places':
-        figure = utilities.figure_waypoints_overtime(places, activities)
+        figure = utilities.figure_waypoints_overtime(places, activities, language)
 
     return figure
 

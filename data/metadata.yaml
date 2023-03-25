@@ -37,18 +37,18 @@ activity:
     icon: tbd
     grades:
       'F': 1
-      F+: 1.4
+      F+:  1.4
       PD-: 1.6
-      PD: 2
+      PD:  2
       PD+: 2.4
       AD-: 2.6
-      AD: 3
+      AD:  3
       AD+: 3.4
-      D-: 3.6
-      D: 4
-      D+: 4.4
+      D-:  3.6
+      D:   4
+      D+:  4.4
       TD-: 4.6
-      TD: 5
+      TD:  5
   via_ferrata:
     icon: tbd 
     grades:
@@ -60,23 +60,43 @@ activity:
   hike:
     icon: tbd
     grades:
-      T1: 1
-      T2: 2
-      T3: T3
-      T4: 4
+      T1:  1
+      T2:  2
+      T3:  3
+      T4:  4
       T4+: 4.5
-      T5: 5
+      T5:  5
       T5+: 5.5
-      T6: 6
+      T6:  6
   ski:
     icon: tbd
     grades:
       PD-: 1
-      PD: 2
+      PD:  2
       PD+: 3
       AD-: 3
-      AD: 4
+      AD:  4
   bike:
     icon: tbd
+    grades:
+      Route: 0
+      VTT  :  1
   climbing:
     icon: tbd
+    grades:
+      3a: 1
+      3b: 2
+      3c: 3
+      4a: 4
+      4b: 5
+      4c: 6
+      5a: 7
+      5a+: 7.5
+      5b: 8
+      5b+: 8.5
+      5c: 9
+      5c+: 9.5
+      6a: 10
+      6a+: 10.5
+      6b: 11 
+      6c: 12

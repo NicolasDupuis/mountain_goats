@@ -32,6 +32,14 @@ translation = {
         'canoe'         : {'fr': 'Canoë',       'en': 'Canoe'         },
     },
 
+    'places': {
+        'summit'        : {'fr': 'Sommet',      'en': 'Summit'        },
+        'pass'          : {'fr': 'Col',         'en': 'Pass'          },
+        'hut'           : {'fr': 'Refuge',      'en': 'Hut'           },
+        'cliff'         : {'fr': 'Falaise',     'en': 'Cliff'         },
+        'POI'           : {'fr': 'POI',         'en': 'POI'           },
+    },
+
     'contexts': {
         'alpine_club': {'fr': 'Club alpin',  'en': 'Alpine club'   },
         'with_guide' : {'fr': 'Avec guide',  'en': 'With a guide'  },

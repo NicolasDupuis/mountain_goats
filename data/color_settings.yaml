@@ -1,11 +1,11 @@
-waypoint_category_color:
+places:
     summit: brown
     pass  : darkOrange
     hut   : darkGreen
     POI   : grey
     cliff : dodgerblue
 
-activity_category_color:
+activities:
     hike            : forestgreen
     mountaineering  : darkorchid
     ski             : blue
