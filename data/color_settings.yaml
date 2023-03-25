@@ -1,0 +1,14 @@
+waypoint_category_color:
+    summit: brown
+    pass  : darkOrange
+    hut   : darkGreen
+    POI   : grey
+    cliff : dodgerblue
+
+activity_category_color:
+    hike            : forestgreen
+    mountaineering  : darkorchid
+    ski             : blue
+    climbing        : orangered
+    bike            : darkturquoise
+    via_ferrata     : darkorange

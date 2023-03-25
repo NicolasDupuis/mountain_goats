@@ -1,0 +1,82 @@
+icons:
+  summit: mdi:summit
+  hut: fluent-emoji-high-contrast:hut
+  pass: game-icons:trail
+  POI: gis:poi-map
+  cliff: openmoji:man-climbing-light-skin-tone
+  mountaineering: mdi:pickaxe
+  ski: mdi:ski
+  hike: gis:hiker
+  bike: material-symbols:directions-bike
+  climbing: mdi:rock-climbing
+  via_ferrata: openmoji:cable
+
+waypoint_color:
+  summit: blue
+  hut: red
+  pass: orange
+  POI: yellow
+  cliff: grey
+
+context:
+  - alpine_club
+  - with_guide
+  - solo
+  - family
+  - friends
+
+role:
+  - lead
+  - first
+  - switch
+  - second
+  - participant  
+
+activity:
+  mountaineering:
+    icon: tbd
+    grades:
+      'F': 1
+      F+: 1.4
+      PD-: 1.6
+      PD: 2
+      PD+: 2.4
+      AD-: 2.6
+      AD: 3
+      AD+: 3.4
+      D-: 3.6
+      D: 4
+      D+: 4.4
+      TD-: 4.6
+      TD: 5
+  via_ferrata:
+    icon: tbd 
+    grades:
+      K1: 1
+      K2: 2
+      K3: 3
+      K4: 4
+      K5: 5
+  hike:
+    icon: tbd
+    grades:
+      T1: 1
+      T2: 2
+      T3: T3
+      T4: 4
+      T4+: 4.5
+      T5: 5
+      T5+: 5.5
+      T6: 6
+  ski:
+    icon: tbd
+    grades:
+      PD-: 1
+      PD: 2
+      PD+: 3
+      AD-: 3
+      AD: 4
+  bike:
+    icon: tbd
+  climbing:
+    icon: tbd

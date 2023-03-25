@@ -1,0 +1,10 @@
+.vscode/
+__pycache__/
+venv/
+_test.py
+_local
+data/places.xlsx
+data/.mapbox_token
+data/backup
+data/places.json
+data/activities.json
