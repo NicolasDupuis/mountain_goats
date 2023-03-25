@@ -328,7 +328,7 @@ def create_map(
     )
 
     try: 
-        mapbox_token = open("data/.mapbox_token").read()
+        mapbox_token = open(".mapbox_token").read()
         map_figure.update_layout(mapbox_style='outdoors', mapbox_accesstoken=mapbox_token)
     except:
         pass
