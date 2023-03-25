@@ -10,6 +10,8 @@ import os
 
 local = os.path.exists('_local')
 
+app.title = "Mountain Goats"
+server = app.server
 app.layout = main_layout(local)
 
 if __name__ == '__main__':
