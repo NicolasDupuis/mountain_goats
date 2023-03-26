@@ -500,10 +500,10 @@ def stats_segment(
                 
                 dmc.RadioGroup(
                     [dmc.Radio(
-                        utilities.translation['groupby'][groupby][language], value=groupby) for groupby in ['year', 'places']
+                        utilities.translation['groupby'][groupby][language], value=groupby) for groupby in ['activity', 'places']
                     ],
                     id    = "switch_year_stats",
-                    value = "year",
+                    value = "activity",
                     orientation = "horizontal",
                     mt    = 10,
                 ),             
@@ -515,7 +515,8 @@ def stats_segment(
         html.Div(id='grades_overtime', style={'display': 'none'}),
         
         html.Div([
-            dcc.Graph(figure=utilities.figure_context_evolution(activities, language)),
+            dcc.Graph(id='context_overtime'),
+            
         ], id='stats_context', style={'display': 'none'})
     ])
     

@@ -135,42 +135,34 @@ def figure_context_evolution(
     if len(activities) == 0:
         return go.Figure()
 
-    def context(row):
 
-        if 'with_guide' in row['context'] or row['role'] in ['second', 'participant']:
-            return 'Encadré & Second' 
-        elif row['role'] in ['lead', 'first']:
-            return 'Encadrant & Premier' 
-        elif row['role'] in ['switch']:
-            return 'Réversible' 
-        else:
-            return 'Solo & N/A'
+    context_map = utilities.translation['contexts']
+    context_map = {key: context_map[key][language] for key in context_map }
+    activities['context'] = activities['context'].map(context_map)
+    activities['year'] = activities['year'].astype(int)
 
-    activities.fillna('', inplace=True)
-    activities['Situation'] = activities.apply(context, axis=1)
-    df = pd.DataFrame(activities.groupby(['year', 'Situation'])['days'].sum()).reset_index()
+    role_map = utilities.translation['roles']
+    role_map = {key: role_map[key][language] for key in role_map }
 
-    context_fig = go.Figure(
-        data=[  go.Bar(  name='Solo & N/A',
-                        x=list(df[df['Situation']=='Solo & N/A']['year']),
-                        y=list(df[df['Situation']=='Solo & N/A']['days']),
-                        marker_color='blue'),
-                go.Bar(  name='Encadré & Second',
-                        x=list(df[df['Situation']=='Encadré & Second']['year']),
-                        y=list(df[df['Situation']=='Encadré & Second']['days']),
-                            marker_color='orangered'),                            
-                go.Bar(  name='Réversible',
-                        x=list(df[df['Situation']=='Réversible']['year']),
-                        y=list(df[df['Situation']=='Réversible']['days']),
-                        marker_color='darkorchid'),
-                go.Bar(  name='Encadrant & Premier',
-                        x=list(df[df['Situation']=='Encadrant & Premier']['year']),
-                        y=list(df[df['Situation']=='Encadrant & Premier']['days']),
-                        marker_color='forestgreen'),       
-        ])
+    activities['role'] = activities['role'].map(role_map)
+    activities['role'].fillna('?', inplace=True)
 
-    context_fig.update_layout(barmode='stack')
-    context_fig.update_layout(yaxis=dict(title='days'))
+    df = pd.DataFrame(activities.groupby(['year', 'context', 'role' ])['days'].sum()).reset_index()
+
+    context_fig = px.bar(
+        df,
+        x         = 'year',
+        y         = 'days',
+        color     = 'role',
+        facet_col = 'context'
+    )
+
+    context_fig.update_layout(
+        yaxis     = dict(title='days'),
+        legend_title = ''
+    )
+    
+    context_fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
 
     return context_fig
 

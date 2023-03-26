@@ -445,7 +445,8 @@ def save_new_place(
      Output('passes_total',              'children'),
      Output('huts_total',                'children'),
      Output('activities_tabulator',      'data'    ),
-     Output('grades_overtime',           'children')],
+     Output('grades_overtime',           'children'),
+     Output('context_overtime',          'figure'  )],
     [Input ('altitude_slider',           'value'   ),
      Input ('year_slider',               'value'   ),                
      Input ('category_selection',        'value'   ),
@@ -519,6 +520,7 @@ def update_all(
         )
     )
 
+    context_overtime = utilities.figure_context_evolution(activities, language)
 
     map_figure = utilities.create_map(
         places,
@@ -539,7 +541,8 @@ def update_all(
         stats_places['pass'],
         stats_places['hut'],
         activities.to_dict('records'),
-        grades_overtime_layout
+        grades_overtime_layout,
+        context_overtime
     )
 
 
@@ -568,7 +571,7 @@ def update_year_figure(
     category_map = {key: category_map[key][language] for key in category_map }
     places['category_translated'] = places['category'].map(category_map)
 
-    if switch == 'year':
+    if switch == 'activity':
         figure = utilities.figure_activities_overtime(activities, language)
 
     elif switch=='places':

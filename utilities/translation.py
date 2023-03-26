@@ -48,12 +48,21 @@ translation = {
         'friends'    : {'fr': 'Entre amis',  'en': 'With friends'  },       
     },
 
+    'context_summary': {
+        'alpine_club': {'fr': 'Club alpin',  'en': 'Alpine club'   },
+        'with_guide' : {'fr': 'Avec guide',  'en': 'With a guide'  },
+        'solo'       : {'fr': 'Solo',        'en': 'Solo'          },
+        'family'     : {'fr': 'En famille',  'en': 'With family'   },
+        'friends'    : {'fr': 'Entre amis',  'en': 'With friends'  },       
+    },
+
     'roles': {
         'lead'       : {'fr': 'Encadrant',         'en': 'Lead'    },
         'first'      : {'fr': 'Premier de cordée', 'en': 'Rope 1st'},
         'switch'     : {'fr': 'Réversible',        'en': 'Switch'  },
-        'second'     : {'fr': 'Seconde cordée',    'en': 'Rope 2nd'},
+        'second'     : {'fr': 'Second de cordée',  'en': 'Rope 2nd'},
         'participant': {'fr': 'Participant',       'en': 'Participant'},         
+        'not_filled ': {'fr': 'Non renseigné',     'en': 'Not filled'},         
     },    
 
     'clearFilterButtonType' : 
@@ -85,8 +94,9 @@ translation = {
          'en': 'New activity'},
 
     'groupby':
-        {'year'    : {'fr': 'Année',    'en': 'Year'},
-         'altitude': {'fr': 'Altitude', 'en': 'Altitude'},
-         'places'  : {'fr': 'Lieux',    'en': 'Places'},
+        {'year'    : {'fr': 'Année',            'en': 'Year'},
+         'activity': {'fr': "Types d'activité", 'en': 'Activity types'},
+         'altitude': {'fr': 'Altitude',         'en': 'Altitude'},
+         'places'  : {'fr': 'Types de lieux',   'en': 'Places types'},
     }
 }
