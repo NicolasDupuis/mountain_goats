@@ -8,10 +8,10 @@ from dash_layouts import main_layout
 import dash_callbacks
 import os
 
-local = os.path.exists('_local')
-
 app.title = "Mountain Goats"
 server = app.server
+
+local = os.path.exists('_local')
 app.layout = main_layout(local)
 
 if __name__ == '__main__':

@@ -3,8 +3,7 @@ __pycache__/
 venv/
 _test.py
 _local
-data/places.xlsx
-data/.mapbox_token
-data/backup
-places.json
-activities.json
+.mapbox_token
+settings/backup/
+data_places.json
+data_activities.json

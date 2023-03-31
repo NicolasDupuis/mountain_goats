@@ -8,8 +8,6 @@ import utilities
 from app_init import app
 import pandas as pd
 import yaml
-import plotly.express as px
-
 
 
 # Dash layouts
@@ -18,6 +16,11 @@ def map_segment(
     places: pd.DataFrame,
     local : bool
 ) -> html:
+
+    highest_altitude = places['altitude'].max()
+    highest_altitude -= highest_altitude % -1000
+    altitude_steps = list(set(list(range(0, highest_altitude, 1000)) + [highest_altitude]))
+    altitude_steps.sort()
 
     layout = html.Div([
 
@@ -42,62 +45,39 @@ def map_segment(
                         dbc.Col([ 
                             dmc.Select(
                                 id          = "search_place", 
-                                label       = "Lieux",
                                 icon        = DashIconify(icon="ic:outline-search", width=20),
-                                placeholder = "Tapez un nom...",
+                                placeholder = "Selectionne un lieu...",
                                 searchable  = True, 
-                                clearable   = True,
-                                data        = [place for place in places['waypoint']]),
-                        ], width= 3),
+                                clearable   = True),
+                        ], width= 2),
 
                         dbc.Col([ 
                             dmc.MultiSelect(
                                 id          = "category_selection", 
-                                label       = "Types",
-                                icon        = DashIconify(icon="ic:outline-search", width=20),
-                                placeholder = "Tapez un nom...",
+                                placeholder = "Selectionn un type de lieux...",
                                 searchable  = True, 
                                 clearable   = True,
                                 value       = [ cat for cat in places['category'].unique()],
                                 data        = [ cat for cat in places['category'].unique()]),
-                        ], width = 5),
-                    ]),
-                    html.Br(),
+                        ], width = 4),
 
-                    dbc.Row([
-                        dbc.Col([ html.Label('Altitude') ], width = 1),
-                        dbc.Col([ 
-                    
-                            dcc.RangeSlider(
-                                id        = 'altitude_slider',
-                                min       = 0,
-                                max       = 5000,
-                                value     = [0, 5000],
-                                marks     = {0: '0m', 1000: '1000m', 2000: '2000m', 3000: '3000m', 4000: '4000m', 5000: '5000m'},
-                                className = "dcc_control"
-                            )
-                        ], width = 10),
-                    ]),
-                    html.Br(),
+                        dbc.Col([     
+                            dmc.RangeSlider(
+                            id        = 'altitude_slider',
+                            min       = 0,
+                            max       = 5000,
+                            value     = [0, 5000],
+                            marks     = [{"value": step, "label":f"{step} m"} for step in altitude_steps]
+                            ),
 
-                    dbc.Row([
-                        dbc.Col([ html.Label('year') ], width = 1),
-                        dbc.Col([ 
-                            dcc.RangeSlider(
-                                id        = 'year_slider',
-                                min       = 2008, 
-                                max       = datetime.now().year + 1,
-                                value     = [2008, datetime.now().year + 1],
-                                marks     = {year: f'{year}' for year in range(2008, datetime.now().year + 1)},
-                                className = "dcc_control"),
-                        ], width = 10),
+                        ], width = 6),
                     ]),
                 ]),
             ]),
-            html.Br()
 
         ], id ='collapse_map_filter'),
 
+        html.Br(), 
         dcc.Graph(id='place_map'), 
 
         dbc.Modal(
@@ -229,7 +209,7 @@ def activities_segment(
                         dbc.Col([
                             dmc.Select(
                                 id         = 'filter_activity_waypoints',
-                                label      = 'Chercher un lieu',
+                                placeholder= 'Selectionne un lieu...',
                                 data       = waypoints,
                                 searchable = True, 
                                 clearable  = True
@@ -359,13 +339,14 @@ def activities_segment(
                         ], width = 6),
                         dbc.Col([                        
                             dmc.NumberInput(
-                                label     = 'Days',
-                                id        = 'new_activity_days',
-                                placeholder='Type a number of days',
-                                step      = 1,
-                                value     = 1,
-                                icon      = DashIconify(icon="game-icons:duration"),
-                                required = True, 
+                                label       = 'Days',
+                                id          = 'new_activity_days',
+                                placeholder = 'Type a number of days',
+                                precision   = 1,
+                                step        = 0.5,
+                                value       = 1,
+                                icon        = DashIconify(icon="game-icons:duration"),
+                                required    = True, 
                             ),                            
                         ], width = 6),
                     ]),
@@ -408,28 +389,28 @@ def activities_segment(
                     dbc.Row([
                         dbc.Col([
                             dmc.TextInput(
-                                label  = 'Topo',
-                                id     = 'new_activity_topo',
-                                placeholder='Type a URL...',
-                                icon   = DashIconify(icon="grommet-icons:waypoint")
+                                label       = 'Topo',
+                                id          = 'new_activity_topo',
+                                placeholder = 'Type a URL...',
+                                icon        = DashIconify(icon="grommet-icons:waypoint")
                             ),
                         ], width= 6),
                         dbc.Col([
                             dmc.TextInput(
-                                label  = 'Blog/Youtube',
-                                id     = 'new_activity_blog',
-                                placeholder='Type a URL...',
-                                icon   = DashIconify(icon="grommet-icons:waypoint")
+                                label       = 'Blog/Youtube',
+                                id          = 'new_activity_blog',
+                                placeholder = 'Type a URL...',
+                                icon        = DashIconify(icon="grommet-icons:waypoint")
                             ),
                         ], width= 6),                        
                     ]),
                     html.Br(), 
 
                     dmc.TextInput(
-                        label  = 'Comment',
-                        id     = 'new_activity_comment',
-                        placeholder='Type a comment, if any',
-                        icon   = DashIconify(icon="material-symbols:add-comment-outline")
+                        label       = 'Comment',
+                        id          = 'new_activity_comment',
+                        placeholder = 'Type a comment, if any',
+                        icon        = DashIconify(icon="material-symbols:add-comment-outline")
                     ),
                     html.Br(), 
 
@@ -465,7 +446,6 @@ def activities_segment(
 # STATS
 # ------------------------------------------------------------------------------------------------
 def stats_segment(
-    activities : pd.DataFrame,
     language
 ) -> html:
     
@@ -481,43 +461,52 @@ def stats_segment(
         html.Div([     
             dmc.Center(     
                 dmc.RadioGroup(
-                    [dmc.Radio(
-                        utilities.translation['groupby'][groupby][language], value=groupby) for groupby in ['year', 'altitude']
-                    ],
-                    id    = "switch_waypoints_fig",
-                    value = "year",
+                    id    = "places_plot_switch",
+                    value = "exploded_view",
                     orientation = "horizontal",
-                    mt    = 10,
                 ),
             ),
-            dcc.Graph(id='all_waypoints'),
+            html.Div([
+                dcc.Graph(id='places_plot'),
+            ], id='places_plot_div', style={'display':'none'}),
+            html.Div([
+                html.Br(),
+                dash_tabulator.DashTabulator(
+                    id      = 'places_trivia_tabulator',
+                    theme   = 'tabulator_simple',
+                    columns = [
+                        {'title': '' , 'field': 'category_translated'},
+                        {'title': 'Plus basse altitude', 'field': 'lowest'},
+                        {'title': 'Plus haute altitude', 'field': 'highest'},
+                        {'title': 'Plus visité'        , 'field': 'most_visited'}
+                    ]
+                ),
+            ], id='places_trivia_div', style={'display': 'none'}),
 
         ], id='stats_places'),
 
-
+        # Activities plot
         html.Div([
-            dmc.Center(
-                
-                dmc.RadioGroup(
-                    [dmc.Radio(
-                        utilities.translation['groupby'][groupby][language], value=groupby) for groupby in ['activity', 'places']
-                    ],
-                    id    = "switch_year_stats",
-                    value = "activity",
-                    orientation = "horizontal",
-                    mt    = 10,
-                ),             
+            html.Br(),
+            dmc.Switch(
+                id      = 'cumulative_activities',
+                size    = "sm",
+                radius  = "lg",
+                label   = "Cumulatif",
+                checked = False
             ),
-            dcc.Graph(id='year_stats_figure'),
-
+            html.Div(id='test'),
+            dcc.Graph(id='activities_plot'),
         ], id='stats_year', style={'display': 'none'}),
 
+        # Grades plot
         html.Div(id='grades_overtime', style={'display': 'none'}),
         
+        # Context plot        
         html.Div([
-            dcc.Graph(id='context_overtime'),
-            
-        ], id='stats_context', style={'display': 'none'})
+            dcc.Graph(id='context_overtime'),            
+        ], id='stats_context', style={'display': 'none'}),      
+
     ])
     
     return layout
@@ -530,25 +519,28 @@ def main_layout(
     language = 'fr'
 ) -> html:
 
-    with open('data/metadata.yaml') as file:
+    with open('settings/metadata.yaml') as file:
         metadata = yaml.load(file, Loader=yaml.FullLoader)
 
     # Load visited places and activities
-    places, activities = utilities.load_data()
-    
-    # Massage data
-    activities = utilities.massage_activity_data(activities, metadata['activity'])
+    places, activities = utilities.load_data(metadata)
+
+    places_df = utilities.places_dict_to_df(places)
+
+    activities_df = utilities.places_dict_to_df(activities)
+    activities_no_waypoints = activities_df[activities_df['waypoints'].isnull()]
+    #print(activities_no_waypoints[['label', 'date']].to_string())
 
     layout = html.Div([
         
         dcc.Store(
             id   = 'places_store',
-            data = places.to_dict('records')
+            data = places
         ),
 
         dcc.Store(
             id   = 'activities_store',
-            data = activities.to_dict('records')
+            data = activities
         ),
 
         dcc.Store(
@@ -645,14 +637,14 @@ def main_layout(
                             dbc.CardBody([
                                 html.Div(
                                     id       = 'map_content',
-                                    children = map_segment(places, local)),
+                                    children = map_segment(places_df, local)),
                                 html.Div(
                                     id       = 'activities_content', 
-                                    children = activities_segment(places, metadata, local, language),
+                                    children = activities_segment(places_df, metadata, local, language),
                                     style    = {'display':'none'}),
                                 html.Div(
                                     id       = 'stats_content',
-                                    children = stats_segment(activities, language),
+                                    children = stats_segment(language),
                                     style    = {'display':'none'})
                             ])
                         ])

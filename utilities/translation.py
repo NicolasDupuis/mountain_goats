@@ -9,7 +9,7 @@ translation = {
 
     'activities_tabulator_columns': 
         [{'name': 'label',               'fr': 'Nom',          'en': 'Label'   },
-         {'name': 'category_translated', 'fr': 'Catégorie',    'en': 'Category'},
+         {'name': 'category_translated', 'fr': 'Sport',        'en': 'Sport'},
          {'name': 'grade',               'fr': 'Cotation',     'en': 'Grade'   },
          {'name': 'date',                'fr': 'Date',         'en': 'Rating'  },
          {'name': 'context_translated',  'fr': 'Contexte',     'en': 'Context' },
@@ -83,7 +83,8 @@ translation = {
         [{'name': 'stats_places',  'fr': 'Lieux',    'en': 'Places'},
          {'name': 'stats_year',    'fr': 'Activités','en': 'Activities'},
          {'name': 'stats_grade',   'fr': 'Niveau',   'en': 'Grade'},
-         {'name': 'stats_context', 'fr': 'Contexte', 'en': 'Context'}],
+         {'name': 'stats_context', 'fr': 'Contexte', 'en': 'Context'},
+    ],
 
     'add_new_place':  
         {'fr': 'Nouveau lieu',
@@ -94,9 +95,14 @@ translation = {
          'en': 'New activity'},
 
     'groupby':
-        {'year'    : {'fr': 'Année',            'en': 'Year'},
-         'activity': {'fr': "Types d'activité", 'en': 'Activity types'},
-         'altitude': {'fr': 'Altitude',         'en': 'Altitude'},
-         'places'  : {'fr': 'Types de lieux',   'en': 'Places types'},
+        {'year'         : {'fr': 'Année',        'en': 'Year'},
+         'activity'     : {'fr': "Par sports",   'en': 'By sports'},
+         'altitude'     : {'fr': 'Altitude',     'en': 'Altitude'},
+         'places'       : {'fr': 'Par lieux',    'en': 'By places'},
+         'exploded_view': {'fr': 'Vue éclatée',  'en': 'Exploded view'},
+         'trivia'       : {'fr': 'Trivia',       'en': 'Trivia'},
+         'curve'        : {'fr': 'Courbe',       'en': 'Curve'},
+         'year_summary' : {'fr': 'Bilan annuel', 'en': 'Yearly summary'},
+         'place_n'      : {'fr': 'Lieux',        'en': 'Places'}
     }
 }
